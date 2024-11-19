@@ -102,7 +102,7 @@ def lib_new():
     # get CommunityRating
     rating = item['CommunityRating']
     # data_new = {"chat_id": send_id, "caption": text_new + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
-    data_new = {"chat_id": send_id, "caption": text_new + '\n\nRating: ★' + rating + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
+    data_new = {"chat_id": send_id, "caption": text_new + '\n\nRating: ★' + str(rating) + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
     requests.post(url_send_photo, data=data_new, files={"photo": image})
 
 
