@@ -99,7 +99,10 @@ def lib_new():
     base_photo_url = (f"{e_server}/emby/Items/{photo_id}/Images/Primary" if photo_id else None)
     image_response = requests.get(base_photo_url)
     image = ("photo.jpg", image_response.content, "image/jpeg")
-    data_new = {"chat_id": send_id, "caption": text_new + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
+    # get CommunityRating
+    rating = item['CommunityRating']
+    # data_new = {"chat_id": send_id, "caption": text_new + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
+    data_new = {"chat_id": send_id, "caption": text_new + '\n\nRating: ★' + rating + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
     requests.post(url_send_photo, data=data_new, files={"photo": image})
 
 
