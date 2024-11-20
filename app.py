@@ -92,7 +92,7 @@ def send_message():
 
 def lib_new():
     global response
-    text_new = "📣 " + response['Title']
+    text_new = "#影视更新# " + response['Server']['Name']
     try:
         desc = response['Description']
     except KeyError:
@@ -104,16 +104,25 @@ def lib_new():
     image = ("photo.jpg", image_response.content, "image/jpeg")
     # get CommunityRating
     try:
-        rating = int(item['CommunityRating'])
+        media_rating = item['CommunityRating']
         showrate = 1
     except KeyError:
-        rating = 0
+        media_rating = 0
         showrate = 0
     filename = item['FileName']
+    media_name = item['Name']
+    media_type = item['Type']
+    media_path = item['Path']
     # taglines = item['Taglines']
     PDate = str(item['PremiereDate'])[:10]
-
-    data_new = {"chat_id": send_id, "caption": text_new + '\n📂 ' + filename + '\n📽️ ' + PDate + '\n🤩 ' * showrate + '⭐️' * rating + '\n\n🔖 ' + desc, "parse_mode": "Markdown"}
+    
+    data_new = {
+        "chat_id": send_id, 
+        "caption": f"{text_new}\n[{media_type}]\n️🎞️片名:  {media_name}\n{showrate * '✨评分:  '}{showrate * str(media_rating)}{showrate * ' '}{showrate * int(media_rating) * '⭐️'}\n\n📆上映:  {PDate}\n\n📝简介:  {desc}\n\n📂路径:  {media_path}"
+    }
+    
+    # data_new = {"chat_id": send_id, "caption": text_new + '\n\\[' + media_type + ']' '\n🏷️片名:  ' + media_name + '\n✨评分:  ' * showrate + str(media_rating) * showrate + ' (' * showrate + '⭐️' * int(media_rating) + ')' * showrate + '\n\n📆上映:  ' + PDate + '\n\n🔖简介:  ' + desc + '\n\n📂路径:  ' + media_path, "parse_mode": "Markdown"}
+    
     requests.post(url_send_photo, data=data_new, files={"photo": image})
     
     # 添加response的所有内容
