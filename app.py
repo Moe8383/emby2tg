@@ -1,5 +1,7 @@
 from flask import Flask, request, abort
 import requests
+import json
+import logging
 from os import environ
 
 app = Flask(__name__)
@@ -21,7 +23,7 @@ def get_icon(argument):
         'playback.stop': '⏹ ',
         'playback.pause': '⏸ ',
         'playback.unpause': '⏯ ',
-        'library.deleted': '🗑 ',
+        'library.deleted': '🗑️ ',
         'item.markunplayed': '❎',
         'item.markplayed': '✅',
         'system.updateavailable': '💾',
@@ -89,7 +91,8 @@ def send_message():
 
 
 def lib_new():
-    text_new = response['Title']
+    global response
+    text_new = "📣 " + response['Title']
     try:
         desc = response['Description']
     except KeyError:
@@ -100,11 +103,27 @@ def lib_new():
     image_response = requests.get(base_photo_url)
     image = ("photo.jpg", image_response.content, "image/jpeg")
     # get CommunityRating
-    rating = item['CommunityRating']
-    taglines = item['Taglines']
-    # data_new = {"chat_id": send_id, "caption": text_new + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
-    data_new = {"chat_id": send_id, "caption": text_new + '\n✅ ' + str(taglines) + '\nRating: ' + '★' * int(rating) + '\n\nDescription: ' + desc, "parse_mode": "Markdown"}
+    try:
+        rating = int(item['CommunityRating'])
+        showrate = 1
+    except KeyError:
+        rating = 0
+        showrate = 0
+    filename = item['FileName']
+    # taglines = item['Taglines']
+    PDate = str(item['PremiereDate'])[:10]
+
+    data_new = {"chat_id": send_id, "caption": text_new + '\n📂 ' + filename + '\n📽️ ' + PDate + '\n🤩 ' * showrate + '⭐️' * rating + '\n\n🔖 ' + desc, "parse_mode": "Markdown"}
     requests.post(url_send_photo, data=data_new, files={"photo": image})
+    
+    # 添加response的所有内容
+    # response_details = json.dumps(response, indent=2)
+
+    # 打印JSON内容到控制台
+    # print("Response JSON:\n", response_details)
+
+    # 记录JSON内容到日志文件
+    # logging.info("Response JSON:\n%s", response_details)
 
 
 def switch_case(argument):
